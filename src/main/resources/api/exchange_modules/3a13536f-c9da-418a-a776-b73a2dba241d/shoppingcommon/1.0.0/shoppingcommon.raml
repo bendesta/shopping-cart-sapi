@@ -1,0 +1,34 @@
+#%RAML 1.0 Library
+usage: |
+  provides a set of reusable coomon data types that commonly
+  occur in type definitions for shopping cart
+
+types:
+
+  Url:
+    type: string
+
+  ResourceId:
+    type: string
+    description: |
+      the unique object identifier
+
+  Location:
+    type: object
+    description: |
+      location
+    properties:
+      locationId:
+        type: string | nil
+        description: |
+          Identifier of location (storeId or warehouseId or partnerId)
+      locationType:
+        type: string
+        description: |
+          Type of location
+        enum: [STORE, WAREHOUSE, PARTNER]
+      deliveryMethod:
+        type: string
+        description: |
+          Type of delivery
+        enum: [SHIPMENT, PICKUP]

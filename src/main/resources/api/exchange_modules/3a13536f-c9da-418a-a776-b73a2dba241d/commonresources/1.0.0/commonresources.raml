@@ -1,0 +1,11 @@
+#%RAML 1.0 Library
+usage: Common RAML Fragments to standardise implementation of common aspects of RAML API Specifications.
+
+traits:
+  common-error-responses: !include traits/common-error-responses.raml
+
+types:
+  common-response: !include types/common-response-format.raml
+
+securitySchemes:
+  clientEnforcement: !include securitySchemes/clientEnforcement.raml

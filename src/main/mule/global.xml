@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config
+		name="shopping-cart-sapi-httpListenerConfig">
+		<http:listener-connection host="0.0.0.0"
+			port="${https.port}" protocol="HTTPS" tlsContext="tlsConfig"/>
+	</http:listener-config>
+	<apikit:config name="shopping-cart-sapi-config"
+		api="shopping-cart-sapi.raml" outboundHeadersMapName="outboundHeaders"
+		httpStatusVarName="httpStatus" />
+	<configuration-properties doc:name="Configuration properties" doc:id="5532d9a7-ac2a-47c5-969d-1e89e5552a84" file="config/application.properties" />
+	<tls:context name="tlsConfig" doc:name="TLS Context" doc:id="3bd98857-96c2-46a9-95e1-eb16054273fa" >
+		<tls:key-store type="jks" path="${tls.keystore.path}" alias="${tls.keystore.alias}" keyPassword="${secure::tls.keystore.key.password}" password="${secure::tls.keystore.password}" />
+	</tls:context>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="86e52ab8-9d53-4bd6-818a-77765ca17c99" file="config/application-secure.properties" key="${secret.key}" />
+	<os:object-store name="customerConfig" doc:name="Object store" doc:id="02ab9545-0ac0-414c-bfad-ba3445a0f411"/>
+	<os:object-store name="ordersConfig" doc:name="Object store" doc:id="8d5d8b45-0ddb-4653-aeaa-4b2a4bc46ecb"/>
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="755bb9a7-1b6c-4c5e-83f9-0f231614e9a8" />
+	<api-gateway:autodiscovery apiId="${app.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="27a12ab0-edb3-4f8e-bcc4-8a3e161090c0" flowRef="shopping-cart-sapi-main" />
+
+
+</mule>
+	
+	

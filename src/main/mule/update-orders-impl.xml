@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:retail-product-availability-process-api="http://www.mulesoft.org/schema/mule/retail-product-availability-process-api" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/retail-product-availability-process-api http://www.mulesoft.org/schema/mule/retail-product-availability-process-api/current/mule-retail-product-availability-process-api.xsd">
+	<sub-flow name="update-orders-impl" doc:id="2b94878e-b09d-4a49-a5dd-3821a54a1176" >
+		<ee:transform doc:name="save input to updateShoppingCart and shoppingCartId" doc:id="32718948-ac41-4b13-86ce-73ac0d995f47" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/emptyItems.dwl" variableName="items" />
+				<ee:set-variable resource="dwl/updateShoppingCart.dwl" variableName="shoppingCart" />
+			</ee:variables>
+		</ee:transform>
+		<os:contains doc:name="Contains shopping cart" doc:id="a29be8b2-9cc9-4f0e-8b7c-57e328699cf6" key="#[vars.shoppingCart.identifier]" objectStore="ordersConfig" />
+		<choice doc:name="Does shopping cart exist?" doc:id="1324b23c-f1d2-4c1c-a915-6dacafbd395c" >
+			<when expression="#[payload == true]" >
+				<foreach doc:name="For Each" doc:id="36acef3e-e0c4-4cb4-b7b0-c43478d92d83" collection="#[vars.shoppingCart.items]" >
+					<set-variable value="#[payload]" doc:name="Set Variable itemDetails" doc:id="c2d710ad-2509-4ef2-9f34-6996aa3517c4" variableName="itemDetails" />
+					<set-variable value="#[vars.counter * 100]" doc:name="Mock Shipping cost" doc:id="4279293c-766b-4aa0-b6bf-d99de66baf62" variableName="shippingCost" />
+					<set-variable value="#[vars.counter * 0.1]" doc:name="Mock Total Tax" doc:id="be328fdd-5095-4a38-ba9c-3ea59b96de36" variableName="totalTax" />
+					<ee:transform doc:name="Add items to items" doc:id="d9ee7881-faae-40a6-bcdd-bc6cc1ca9dfe" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable resource="dwl/items.dwl" variableName="items" />
+						</ee:variables>
+					</ee:transform>
+				</foreach>
+				<os:retrieve doc:name="Retrieve shopping cart" doc:id="1d5cfc58-8cbc-4bf5-ac01-725cae01894b" key="#[vars.shoppingCart.identifier]" objectStore="ordersConfig" />
+				<ee:transform doc:name="Mapping shopping cart" doc:id="8f884e4c-8fb0-46d3-a30a-43bc61d0944a" >
+					<ee:message >
+						<ee:set-payload resource="dwl/cartPayload.dwl" />
+					</ee:message>
+				</ee:transform>
+				<os:store doc:name="Overwrite shopping cart" doc:id="91e428ba-480b-4b33-85d1-2458f945109b" key="#[vars.shoppingCart.identifier]" objectStore="ordersConfig" />
+				<ee:transform doc:name="Response message" doc:id="f081b922-1273-49e4-8065-6359ad67c2e8" >
+					<ee:message >
+						<ee:set-payload resource="dwl/updateCartResponse.dwl" />
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Error Message 404" doc:id="11398ab4-699e-4ea0-b450-e13a93526814" >
+					<ee:message >
+						<ee:set-payload resource="dwl/noCart.dwl" />
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable resource="dwl/httpStatus404.dwl" variableName="httpStatus" />
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

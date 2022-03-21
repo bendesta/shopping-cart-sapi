@@ -1,0 +1,74 @@
+#%RAML 1.0
+title: shopping-cart-sapi
+
+version: v1.0
+protocols:
+  - HTTPS
+baseUri: https://localhost:8082/api
+
+uses:
+  shoppingCart: exchange_modules/3a13536f-c9da-418a-a776-b73a2dba241d/shoppingcart/1.0.0/shoppingcart.raml
+  common: exchange_modules/3a13536f-c9da-418a-a776-b73a2dba241d/commonresources/1.0.0/commonresources.raml
+
+types:
+  shoppingCartCollection:
+    type: shoppingCart.ShoppingCart
+  itemsCollection:
+    type: object
+    properties:
+      items: 
+        description: Collection of items in shopping cart
+        type: shoppingCart.ItemSummary[]
+  successMessage: 
+    properties:
+      message: string
+      identifier?: string
+
+securitySchemes:
+  basic:
+    description: |
+      This API supports Basic Authentication.
+    type: Basic Authentication
+
+
+/shoppingCarts:
+  is: [common.common-error-responses]
+  post:
+    securedBy: [basic]
+    displayName: Create shopping cart
+    description: Create shopping Cart
+    body:
+      application/json:
+          type: shoppingCartCollection
+          example: !include examples/shoppingCartPostRequest.json
+    responses:
+      201:
+        body: 
+          application/json:
+            type: successMessage 
+            example: |
+              {
+                "message": "Shopping cart was created",
+                "identifier": "de90b8bb-a97a-4e63-aaba-954ebb129485"
+              }  
+  /{shoppingCartId}:
+    is: [common.common-error-responses]     
+    put:
+      securedBy: [basic]
+      displayName: Update shopping cart
+      description: Update shopping cart  
+      body:
+        application/json:
+          type: itemsCollection
+          example:  !include examples/shoppingCartPutRequest.json 
+        
+      responses:
+        200:
+          body: 
+            application/json: 
+              type: successMessage
+              example: 
+                {
+                  "message": "Shopping cart was updated"
+                }
+  

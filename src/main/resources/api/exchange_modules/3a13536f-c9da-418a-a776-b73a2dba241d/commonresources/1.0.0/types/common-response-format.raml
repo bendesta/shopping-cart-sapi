@@ -1,0 +1,43 @@
+#%RAML 1.0 DataType
+displayName: Common Response Format
+description: The common response format used for all API Calls.
+properties:
+  header:
+    type: object
+    description: 
+    properties:
+      apiName:
+        type: string
+        description: Name of the API
+        example: "Simple Broker API"
+        required: true
+      apiVersion:
+        type: string
+        description: Version of the API
+        example: "v1.0.0"
+        required: true
+      correlationId:
+        type: string
+        description: A unique UUID for the request.
+        required: true
+        example: "101-aaa-bbb-ccc-ddd-202"
+  error:
+    type: object
+    required: false
+    description: An optional object only returnED in case of an error. 
+    properties:
+      description:
+        type: string
+        description: A description of the error.
+        example: Missing required header - x-api-correlation-id
+        required: true
+      code:
+        type: string
+        description: A unique code identifying the error.
+        example: 'API_GET_001'
+        required: true
+      timestamp:
+        type: string
+        required: true
+        description: A timestamp identifying the time of the error.
+        example: "2020-01-01T00:00:01"

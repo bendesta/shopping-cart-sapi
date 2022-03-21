@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="create-orders-impl-suite.xml" />
+	<munit:test name="create-orders-impl-test-new-cart" doc:id="54a7d0f3-3e28-4c0a-b8d5-49e9d2184e73" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Contains customerId" doc:id="f84d938f-9cd4-4256-bf91-02f190a05311" processor="os:contains">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e2e40d09-b2de-4345-a72c-8e6e71d9e19a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Store customer" doc:id="f86a9974-9dc1-4e94-a737-187164ecd1c1" processor="os:store">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1b07a1ab-5478-49f1-85d1-b13b98e15928" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Store shopping cartStore shopping cart" doc:id="03bf17ad-bebb-4102-b8ab-f07d8347fdbb" processor="os:store">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9f2e5bf2-1b2b-4693-8685-ab69788103e9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload2.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="726b50da-e7ff-4e1c-9ee0-6a7058751ae5" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://createordersimpltest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://createordersimpltest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to create-orders-impl" doc:id="929564fb-03a1-469c-9742-715228e95e67" name="create-orders-impl"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="e2a4e747-5f30-4aa0-a1f7-5a2713dbc72a" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import createordersimpltest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="create-orders-impl-test-existing-cart" doc:id="8a1c4c7e-2fce-40e9-9a29-fcd1ee840db8" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Retrieve customer's shopping carts" doc:id="8cd47948-bf63-44db-8b50-d2008a5bf9ab" processor="os:retrieve">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="020b8437-7d28-4635-a350-f189e881f9e3" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload3.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Contains customerId" doc:id="93229a63-463f-4ecb-bbd6-722679d00f66" processor="os:contains">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e2e40d09-b2de-4345-a72c-8e6e71d9e19a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload4.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Store customer" doc:id="975b988d-de62-4fa5-98bf-94fc2248d6b4" processor="os:store">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1b07a1ab-5478-49f1-85d1-b13b98e15928" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload5.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Store shopping cartStore shopping cart" doc:id="5f432800-dcd3-4a15-aff3-b15e5027b531" processor="os:store">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9f2e5bf2-1b2b-4693-8685-ab69788103e9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://createordersimpltest\mock_payload6.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="05c364f2-45b0-4303-9851-d0d86b10e1a6" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://createordersimpltest\set-event_payload1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://createordersimpltest\set-event_attributes1.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to create-orders-impl" doc:id="ddcb1d75-65d2-4751-9253-42cab2a1a0ea" name="create-orders-impl"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="88af3ce7-cc9b-43dc-86dd-7400cf1021a1" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import createordersimpltest::assert_expression_payload1
+---
+assert_expression_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

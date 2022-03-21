@@ -1,0 +1,31 @@
+#%RAML 1.0 Library
+usage: |
+  provides a set of reusable product data types that commonly
+  occur in type definitions
+
+uses:
+  common: ../../shoppingcommon/1.0.0/shoppingcommon.raml
+
+types:
+  Product:
+    type: object
+    description: |
+      product object
+    properties:
+      identifier: common.ResourceId
+      categoryId?:
+        type: string[]
+      brand?:
+        type: string
+      model?:
+        type: string
+      pictures?:
+        type: common.Url[]
+      description?:
+        type: string
+      rating?:
+        type: integer
+        minimum: 1
+        maximum: 5
+      price: 
+        type: string

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+    <flow name="shopping-cart-sapi-main">
+        <http:listener config-ref="shopping-cart-sapi-httpListenerConfig" path="${https.path}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="shopping-cart-sapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/badRequest.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpsStatus400.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/resourceNotFound.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpsStatus404.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/methodNotAllowed.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpStatus405.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/notAcceptable.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpStatus406.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/unsupportMediaType.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpStatus415.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/notImplemented.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpsStatus501.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a8e7ee43-9abd-4238-bf63-2744030ceffb">
+                <ee:transform doc:name="Transform Message" doc:id="6a68457a-8ecc-4a3d-9931-13e6e13555d0">
+                    <ee:message>
+                        <ee:set-payload resource="dwl/internalError.dwl" />
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable resource="dwl/httpStatus500.dwl" variableName="httpStatus" />
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\shoppingCarts\(shoppingCartId):application\json:shopping-cart-sapi-config" doc:id="d58103d8-2dac-4b8c-8572-809f9f39c7cc">
+        <flow-ref doc:name="Flow Reference to update-orders-impl" doc:id="c3a57e74-9207-4662-b38e-4168c4f5dbe6" name="update-orders-impl" />
+    </flow>
+    <flow name="post:\shoppingCarts:application\json:shopping-cart-sapi-config" doc:id="199e253d-badf-4b9c-9f5c-0cbf07a413c9">
+        <flow-ref doc:name="Flow Reference to create-orders-impl" doc:id="ddeff331-18fa-4109-8124-b78b4af9d8ae" name="create-orders-impl" />
+    </flow>
+</mule>

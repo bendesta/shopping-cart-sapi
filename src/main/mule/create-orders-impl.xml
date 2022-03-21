@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="create-orders-impl" doc:id="ef1646b5-3510-4e58-bead-859c9544399e" >
+		<logger level="INFO" doc:name="Start Log" doc:id="95b9ff05-b4f1-478d-af61-84eb39d3b729" message="Create Cart Flow Starts"/>
+		<ee:transform doc:name="Generate Identifier and transform input" doc:id="ed50bb87-d097-4630-a6f6-def3d542f7e9" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable resource="dwl/shoppingCart.dwl" variableName="shoppingCart" />
+				<ee:set-variable resource="dwl/emptyItems.dwl" variableName="items" />
+			</ee:variables>
+		</ee:transform>
+		<os:contains doc:name="Contains customerId" doc:id="e2e40d09-b2de-4345-a72c-8e6e71d9e19a" key="#[vars.shoppingCart.customerId]" objectStore="customerConfig"/>
+		<choice doc:name="Does customer entry exist?" doc:id="26cf4f98-ed6b-47bf-a4c7-fa97294f4290" >
+			<when expression="#[payload == false]">
+				<logger level="INFO" doc:name="Logger" doc:id="7ff39aa1-06c3-4c58-bb86-b2b5bc541705" message="First Cart"/>
+				<ee:transform doc:name="Add first cartId" doc:id="f7354c86-71e4-42c5-b092-9ff8ec5ae105" >
+					<ee:message >
+						<ee:set-payload resource="dwl/newCustomerCart.dwl" />
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="dc6a1402-669d-49e0-920e-abc67d7d7b2f" message="Customer Already Exist"/>
+				<os:retrieve doc:name="Retrieve customer's shopping carts" doc:id="020b8437-7d28-4635-a350-f189e881f9e3" key="#[vars.shoppingCart.customerId]" objectStore="customerConfig"/>
+				<ee:transform doc:name="Add cartId to existing list" doc:id="5e622f03-ec71-493a-a8ea-466577a83068" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload + vars.shoppingCart.identifier]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<os:store doc:name="Store customer" doc:id="1b07a1ab-5478-49f1-85d1-b13b98e15928" key="#[vars.shoppingCart.customerId]" objectStore="customerConfig"/>
+		<foreach doc:name="For Each" doc:id="74ffc50b-4d93-4448-a12b-585e6d0147af" collection="#[vars.shoppingCart.items]">
+			<set-variable value="#[payload]" doc:name="itemDetails" doc:id="72d4e432-0b70-483d-9b78-c8dbd814f60b" variableName="itemDetails"/>
+			<set-variable value="#[vars.counter * 100]" doc:name="Mock Shipping cost" doc:id="de1fa332-ecb1-4722-aa4b-28e8ed3f5ede" variableName="shippingCost"/>
+			<set-variable value="#[vars.counter * 0.1]" doc:name="Mock Total Tax" doc:id="3d918d1e-5f96-4d4f-a8a8-721875043c2a" variableName="totalTax"/>
+			<ee:transform doc:name="Add items to items" doc:id="fce007bd-cf8c-4fd9-bcc9-8156054d5337" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable resource="dwl/items.dwl" variableName="items" />
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+		<ee:transform doc:name="Mapping Shopping Cart" doc:id="9be56f1c-460b-4f2c-9b3e-b5c0551dca12">
+				<ee:message>
+				<ee:set-payload resource="dwl/mappingCart.dwl" />
+				</ee:message>
+			</ee:transform>
+		<os:store doc:name="Store shopping cartStore shopping cart" doc:id="9f2e5bf2-1b2b-4693-8685-ab69788103e9" key="#[vars.shoppingCart.identifier]" objectStore="ordersConfig"/>
+		<ee:transform doc:name="Transform Message" doc:id="8941146b-4b22-489b-a8f2-fbd6f7e26521" >
+			<ee:message >
+				<ee:set-payload resource="dwl/createCartResponse.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Log" doc:id="75b32397-4fe5-4853-b4ac-28c73ea5c5bf" message="Create Cart Flow Ends"/>
+	</sub-flow>
+</mule>

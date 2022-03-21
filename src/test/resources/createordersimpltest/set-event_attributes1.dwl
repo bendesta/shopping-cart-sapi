@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "client_id": "123456",
+    "cilent_secret": "2345656",
+    "content-type": "application/json",
+    "user-agent": "PostmanRuntime/7.28.2",
+    "accept": "*/*",
+    "postman-token": "005954d8-70bc-4bef-b655-7e9bec4fa34e",
+    "host": "localhost:8082",
+    "accept-encoding": "gzip, deflate, br",
+    "connection": "keep-alive",
+    "content-length": "734"
+  },
+  "clientCertificate": null,
+  "method": "POST",
+  "scheme": "https",
+  "queryParams": {},
+  "requestUri": "/api/shoppingCarts",
+  "queryString": "",
+  "version": "HTTP/1.1",
+  "maskedRequestPath": "/shoppingCarts",
+  "listenerPath": "/api/*",
+  "relativePath": "/api/shoppingCarts",
+  "localAddress": "/127.0.0.1:8082",
+  "uriParams": {},
+  "rawRequestUri": "/api/shoppingCarts",
+  "rawRequestPath": "/api/shoppingCarts",
+  "remoteAddress": "/127.0.0.1:60029",
+  "requestPath": "/api/shoppingCarts"
+}
